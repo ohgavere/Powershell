@@ -1,6 +1,4 @@
-﻿Function CreateUsersFromCsv
-{
-
+﻿
 
 #[CmdletBinding()]
 Param(
@@ -10,39 +8,21 @@ Param(
    [Parameter(Mandatory=$false)]
    [string]$csvPath,
 
-   [Parameter(Mandatory=$false, de )]
+   [Parameter(Mandatory=$false)]
    [bool]$makeOU,
 
    [switch]$test
 )
-Process {
-
-    Write-Host "================================================="
-    Write-Host "===   First Checks before running"
-    Write-Host "================================================="
-
-    if ($makeOU -eq $null) { $makeOU = $false }
-    Write-Host "::makeOU --`t--`t-- [$makeOU]"
-    
-}
-
-
 
 
 <# ************************************************* #>
 <# *** DEFAULT VARIABLES ************************************************************** #>
 <# ************************************************* #>
 
-#DEFAULT CSV FILE PATH & NAME
-$_DEFAULT_CSV = "c:\user.csv" 
-
-#DEFAULT makeOU value
-$_DEFAULT_makeOU = $true
-
-
 $_SPACE_LINE = "`n==================================================================================================`n"
 
-
+$_DEFAULT_CSV = "c:\user.csv"
+$_DEFAULT_makeOU = $false
 
 
 <# ************************************************* #>
@@ -76,11 +56,15 @@ $tld2 = "DOM50"
 
 
 <# ************************************************* #>
-<# *** CHECK INIT PARAMS ************************************************************** #>
+<# *** CHECK PARAMS ************************************************************** #>
 <# ************************************************* #>
 
+Write-Host "================================================="
+Write-Host "===   First Checks before running"
+Write-Host "================================================="
+
+#if ($csvPath -eq $null) { $csvPath  = $_DEFAULT_CSV }
 if ($csvPath -ne $null) {
-    
     if ((Test-Path -Path $csvPath) -eq $true) {
         # NOT FOR USE IT BUT TO REMOVE ANY POSSIBLE CONFLICT
         $_DEFAULT_CSV = $csvPath
@@ -91,15 +75,65 @@ if ($csvPath -ne $null) {
     }
 
 }
+if ($makeOU -eq $null) { $makeOU   = $_DEFAULT_makeOU } 
+    else { $_DEFAULT_makeOU = $makeOU }
 
-Write-Host "Will load CSV file at $_DEFAULT_CSV" 
+Write-Host "::csvPath `t--`t`t-- [$csvPath]"
+Write-Host "::makeOU  `t--`t`t-- [$makeOU]"
+
+Write-Host "================================================="
+    
 
 
 
 
+<# ************************************************* #>
+<# *** PRE-LOADS ************************************************************** #>
+<# ************************************************* #>
+Write-Host "================================================="
+Write-Host "===   Starting loading "
+Write-Host "================================================="
 
+Write-Host "=======   Loading AD module ======="
 Import-Module ActiveDirectory 
+
+Write-Host "=======   Loading CSV file ======="
 $Users = Import-Csv -Delimiter ";" -Path $_DEFAULT_CSV
+$arrayDpt = [System.Collections.ArrayList]@()
+
+foreach ($dpt in $Users.department) {  
+    
+    #Write-Host "`n`t`t Debug::   Got value [$dpt]  eq? -> " + ($arrayDpt -eq $dpt)
+
+    $arrayDpt.add($dpt)
+
+    #Write-Host "`n`t`t Debug::   Got value [$dpt]"
+
+} 
+
+#Write-Host "Initial dpt copunt check 1 == " $Users.department.Count ;
+#Write-Host "Initial dpt copunt check 2 (before get-unique) == " $arrayDpt.Count ;
+#$arrayDpt = $arrayDpt | Sort-Object -Unique # works too
+$arrayDpt = $arrayDpt | Sort-Object | Get-Unique -AsString
+#Write-Host "Last Count (after get-unique) == " $arrayDpt.Count ;
+
+
+
+
+
+Write-Host "`t`t`t Got [ $Users.Count ] user(s) from CSV"
+Write-Host "`t`t`t`t with [ $arrayDpt.Count ] different department(s). "
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -156,43 +190,10 @@ foreach ($User in $Users)  {
 echo ""
 echo ""
 echo ""
-echo "============================="
-echo "============================="
-echo "============================="
+Write-Host $_SPACE_LINE
 echo ""
 echo ""
 echo ""
-
-
-$arrayDpt = [System.Collections.ArrayList]@()
-
-#= $(
-foreach ($dpt in $Users.department) {  
-    
-
-    Write-Host "`n`t`t Debug::   Got value [$dpt]  eq? -> " + ($arrayDpt -eq $dpt)
-
-    $arrayDpt.add($dpt)
-
-    #Write-Host "`n`t`t Debug::   Got value [$dpt]"
-
-
-
-} 
-#) | sort | Get-Unique -AsString ;
-
-
-
-Write-Host "Count 1 (initial data ) == " $Users.department.Count ;
-Write-Host "Count 2 (resultArray before) == " $arrayDpt.Count ;
-#$arrayDpt = $arrayDpt | Sort-Object -Unique # works too
-$arrayDpt = $arrayDpt | Sort-Object | Get-Unique -AsString
-
-Write-Host "Last Count (resultArray after) == " $arrayDpt.Count ;
-
-
-
-#foreach ($dpt in $arrayDpt) {   Write-Host "`n`n`t DEBUG2::: Got [$dpt]"}
 
 
 foreach ($dpt in $arrayDpt) {
@@ -265,5 +266,3 @@ foreach ($dpt in $arrayDpt) {
     
 }
 
-
-}
