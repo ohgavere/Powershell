@@ -100,16 +100,23 @@ Param(
     [switch]$test 
         , #a comma ',' is needed to separate parameters declaration
 
+
+
     #Defines a parameter that :
         # -> you ALWAYS HAVE to set when calling the script
         # -> MUST BE at 1st position
     [Parameter(Mandatory=$True, Position=1)]
-    [string]$computerName    ,
+    [string]$computerName    
+        , #a comma ',' is needed to separate parameters declaration
 	
+
+
     #Defines a parameter not mandatory
     [Parameter(Mandatory=$false)]
     [string]$csvPath
-
+        
+        # Not the last one ! 
+        #, #a comma ',' is needed to separate parameters declaration
 
 )
 
