@@ -11,6 +11,8 @@ $ou_prefix = "OU=" ;
 # IMPORTANT VARIABLES 
 #####################
 
+$X500_LOCAL_DOMAIN = "" ;
+
 # Le domaine contiendra une OU principale [..._objects] pour tous les objets de ce domaine
 $DOMAIN_OU_SUFFIX = '_objects';
 # Variable qui contiendra le DN complet de l'OU principale
@@ -65,6 +67,7 @@ $LOWEST_DN_LEVEL= '';
 
         if ($l.Length -gt 0) {
         
+            # save the first as the 'local domain' where we operate
             if ($LOWEST_DN_LEVEL.Length -eq 0) {
                 $LOWEST_DN_LEVEL = $l;
             }
@@ -72,12 +75,19 @@ $LOWEST_DN_LEVEL= '';
 #            Write-Host "[$l]";
             $DOMAIN_OU_DN_FULL += "$l";
 
+            # rebuild x500 
+            $X500_LOCAL_DOMAIN += $l ;
+
             if ($loopCount -lt $TLDLevelsCount) {
                 $DOMAIN_OU_DN_FULL += $dn_separator ;
                 $DOMAIN_OU_DN_FULL += $dn_prefix ;
 #               Write-Host "$DOMAIN_OU_DN_FULL";
-            }
-            
+
+                # rebuild x500 
+                $X500_LOCAL_DOMAIN += "." ;
+
+            }           
+
         
         } # END IF LENGTH
         $loopCount++;
@@ -147,7 +157,7 @@ Write-Host "`tEntrez les un par un et terminez par un nom vide pour cloturer la 
     } 
     while ($str.Length -gt 0);
 
-
+    
     
 
 ####################
@@ -157,3 +167,88 @@ Write-Host "`tEntrez les un par un et terminez par un nom vide pour cloturer la 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+$DATA_PATH = ".\data" ;
+
+# utiliser ou-h.json pour definir la hierarchie des OU a créer POUR CHAQUE DEPAARTEMENT !
+#$OU_FILENAME = "ou.json";
+$OU_HIERARCHY_FILENAME = "ou-h.json";
+
+# utiliser 
+#$USERS_FILENAME = "users.json" ;
+$USERS_FILENAME_SUFFIX = "$X500_LOCAL_DOMAIN.json" ;
+
+
+
+
+##################
+##     3.  Creation des OU
+
+## 3.1  SWITCH EN FONCTION DU DOMAINE
+
+if ($LOWEST_DN_LEVEL.Length -eq 0) {
+
+    Write-host "Cannot find the name of the local domain in the DN path."
+        -ForegroundColor Red ;
+
+    pause ;
+    exit ;
+} else { 
+  
+    Write-host "Gonna search for OU hierarchy in .\data\ou-h.csv" ;
+
+    Write-host "Gonna search for USERS lists by department in :" ;
+
+    foreach ($dpt in $DPTList) {
+        Write-Host "`t for DPT [$dpt] `t`t`t--->`t $DATA_PATH\$dpt.$USERS_FILENAME_SUFFIX" ;
+    }
+
+    foreach ($dpt in $DPTList) {
+
+        #$OU_DATA = Import-Csv -Delimiter "}" -Path "$DATA_PATH$OU_FILENAME" 
+        $USERS_DATA = (Get-content "$DATA_PATH\$dpt.$USERS_FILENAME_SUFFIX") -join "`n" | ConvertFrom-Json ;
+
+        Write-Host "`n`tGot data for DPT [$dpt] from file [$DATA_PATH\$dpt.$USERS_FILENAME_SUFFIX] `n ";
+        $USERS_DATA | ft -AutoSize -Wrap | Write-Output ;
+
+    }
+}
+
+
+####################
+## END 3
+####################
+
+
+
+
+
+
+
+
+
+
+##################
+##     4.  Creation des OU
+
+## 4.1  LOAD MODULE AAD
+Import-Module ActiveDirectory 
+
+## 4.2  Creation des OU
+
+
+
+## 4.3  Creation des USERS
