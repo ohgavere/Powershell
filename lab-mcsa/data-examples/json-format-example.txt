@@ -1,0 +1,47 @@
+﻿
+## START THE JSON FILE WITH THIS HEADER CONTAINING DEPARTMENTS LISTS
+
+{ "Users": {
+	"Departments": [
+		"dpt_1",
+		"dpt_2",
+		"dpt_3"
+	],
+
+## AFTER THIS LINE YOU START ADD DEPARTMENTS DATA.
+
+# TO CONVERT CSV TO JSON EASILY : http://www.convertcsv.com/csv-to-json.htm
+    # STEP 2 :  Select "First row is colum name" if needed.
+    # STEP 5 :  use the "CSV to JSON" button.
+
+
+## For each department do the following :
+
+	"dpt_1": [
+
+## HERE YOU PASTE THE CONTENT OF THE CSV FILE (ONE BY DEPARTMENT IS EASIER) CONVERTED TO JSON.
+          {
+            "FirstName":"user100",
+            "SamAccountName":"user100",
+            "UserPrincipalName":"user100@dom.be"
+          },
+          {
+            "FirstName":"user101",
+            "SamAccountName":"user101",
+            "UserPrincipalName":"user101@dom.be"
+          }
+
+## END YOU FINISH EACH DEPARTMENT LIKE THIS : 
+
+]
+
+# IF YOU NEED AN OTHER DEPARTMENT, YOU ADD A COMMA : 
+
+,
+
+## AND RESTART WITH DPT "header" ...
+
+# IF NOT, YOU END THE JSON FILE WITH THIS : 
+
+  }
+}

@@ -1,0 +1,16 @@
+﻿{ "Users": {
+	"Departments": [
+		"dpt_1",
+		"dpt_2",
+		"dpt_3"
+	],
+	"dpt_1": 
+#PASTE HERE
+,
+    "dpt_2":
+#PASTE HERE
+,
+    "dpt_3":
+#PASTE HERE    
+    }
+}

@@ -1,0 +1,15 @@
+{
+	"MSA",
+	"EMPLOYEE" : {
+		"MANAGER"
+		"USERS"
+	},
+	"COMPUTERS": {
+		"WIN7",
+		"WIN8.1"
+	},
+	"SERVERS": {
+		"2K12R2",
+		"2K8R2"
+	}
+}
